@@ -1,0 +1,146 @@
+
+
+Set Up NFS Server and Client
+
+
+
+Network File System (NFS) also known as client/server file system is a popular, cross-platform and distributed file system protocol used to export local file systems over the network so that clients can share directories and files with others over a network and interact with them as though they are mounted locally.
+
+
+Setting Up NFS Server
+
+1. First, start by installing the required packages on the NFS server. The packages are nfs-utils which provides a daemon for the kernel NFS server and related tools such as the contains the showmount program.
+
+Run the following command to install the package on the NFS server (use sudo if you are administering the system as a non-root user).
+
+# dnf install nfs-utils
+
+2. Once the installation is complete, start the nfs-server service, enable it to automatically start at system boot, and then verify its status using the systemctl commands.
+
+# systemctl start nfs-server.service
+
+# systemctl enable nfs-server.service
+
+# systemctl status nfs-server.service
+oject - Set Up NFS Server and Client
+Updated automatically every 5 minutes
+Set Up NFS Server and Client
+
+
+
+Network File System (NFS) also known as client/server file system is a popular, cross-platform and distributed file system protocol used to export local file systems over the network so that clients can share directories and files with others over a network and interact with them as though they are mounted locally.
+
+
+Setting Up NFS Server
+
+a). First, start by installing the required packages on the NFS server. The packages are nfs-utils which provides a daemon for the kernel NFS server and related tools such as the contains the showmount program.
+
+Run the following command to install the package on the NFS server (use sudo if you are administering the system as a non-root user).
+
+# dnf install nfs-utils
+
+b). Once the installation is complete, start the nfs-server service, enable it to automatically start at system boot, and then verify its status using the systemctl commands.
+
+# systemctl start nfs-server.service
+
+# systemctl enable nfs-server.service
+
+# systemctl status nfs-server.service
+
+
+c). Next, create the file systems to export or share on the NFS server. For this guide, we will create four file systems, three of which are used by staff from three departments: human resource, finance and marketing to share files and one is for root user backups.
+
+# mkdir -p  /share
+
+# ls -
+
+
+d). Then export the above file systems in the NFS server /etc/exports configuration file to determine local physical file systems that are accessible to NFS clients.
+
+/mnt/share
+         *(rw,sync,no_root_squash)
+         oject - Set Up NFS Server and Client
+Updated automatically every 5 minutes
+Set Up NFS Server and Client
+
+
+
+Network File System (NFS) also known as client/server file system is a popular, cross-platform and distributed file system protocol used to export local file systems over the network so that clients can share directories and files with others over a network and interact with them as though they are mounted locally.
+
+
+Setting Up NFS Server
+
+1. First, start by installing the required packages on the NFS server. The packages are nfs-utils which provides a daemon for the kernel NFS server and related tools such as the contains the showmount program.
+
+Run the following command to install the package on the NFS server (use sudo if you are administering the system as a non-root user).
+
+# dnf install nfs-utils
+
+2. Once the installation is complete, start the nfs-server service, enable it to automatically start at system boot, and then verify its status using the systemctl commands.
+
+# systemctl start nfs-server.service
+
+# systemctl enable nfs-server.service
+
+# systemctl status nfs-server.service
+
+
+3. Next, create the file systems to export or share on the NFS server. For this guide, we will create four file systems, three of which are used by staff from three departments: human resource, finance and marketing to share files and one is for root user backups.
+
+# mkdir -p  /share
+
+# ls -l /share
+
+
+4. Then export the above file systems in the NFS server /etc/exports configuration file to determine local physical file systems that are accessible to NFS clients.
+
+/mnt/share          *(rw,sync,no_root_squash)
+
+5. To export the above file system, run the exportfs command with the -a flag means export or unexport all directories, -r means reexport all directories, synchronizing /var/lib/nfs/etab with /etc/exports and files under /etc/exports.d, and -v enables verbose output.
+
+# exportfs -arv
+
+
+6. To display the current export list, run the following command.
+
+# exportfs  -s
+
+7. Next, if you have the firewalld service running, you need to allow traffic to the necessary NFS services (mountd, nfs, rpc-bind) via the firewall, then reload the firewall rules to apply the changes, as follows.
+
+# firewall-cmd --permanent --add-service=nfs
+
+# firewall-cmd --permanent --add-service=rpc-bind
+
+# firewall-cmd --permanent --add-service=mountd
+
+# firewall-cmd --reload
+
+
+Setting Up NFS Client on Client Systems
+8. Now on the client node(s), install the necessary packages to access NFS shares on the client systems. Run the appropriate command for your distribution:
+
+# dnf install nfs-utils nfs4-acl-tools  
+
+9. Then run the showmount command to show mount information for the NFS server. The command should output the exported file system on the client as shown in the screenshot.
+
+# showmount -e 192.168.29.143
+
+9. Next, create a local file system/directory for mounting the remote NFS file system and mount it as an ntf file system.
+
+# mkdir -p /nfs-share
+
+# mount -t nfs 192.168.29.143:/share /nfs-share
+
+10. Then confirm that the remote file system has been mounted by running the mount command and filter nfs mounts.
+
+# mount | grep nfs
+
+11. To enable the mount to persistent even after a system reboot, run the following command to enter the appropriate entry in the /etc/fstab.
+
+# echo "192.168.29.143:/share     /nfs-share  nfs     defaults 0 0">>/etc/fstab
+
+# cat /etc/fstab
+
+13. To unmount the remote file system on the client-side.
+
+# umount /mnt/backups
